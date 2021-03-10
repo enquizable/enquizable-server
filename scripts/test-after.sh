@@ -1,3 +1,3 @@
 #!/bin/bash
-nvm use
+# nvm use
 npm install
