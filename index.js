@@ -5,7 +5,7 @@ const app = express();
 
 app.use(morgan('dev'));
 app.get('/', (req, res) => {
-  res.send('<h1>Change circleci workflows</h1>')
+  res.send('<h1>Last test</h1>')
 });
 
 app.listen(3000, () => console.log('listening on 3000'))
