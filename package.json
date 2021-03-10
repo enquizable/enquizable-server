@@ -1,0 +1,22 @@
+{
+  "name": "enquizable-server",
+  "version": "1.0.0",
+  "description": "A platform for collective quiz creation and improvement.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enquizable/enquizable-server.git"
+  },
+  "author": "Jordan Holmes, Jon Zawada, Pete Teerawattanasook",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/enquizable/enquizable-server/issues"
+  },
+  "homepage": "https://github.com/enquizable/enquizable-server#readme",
+  "dependencies": {
+    "jest": "^26.6.3"
+  }
+}
