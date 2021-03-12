@@ -3,6 +3,10 @@ const morgan = require('morgan');
 
 const app = express();
 
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(bodyParser.json());
+
 app.use(morgan('dev'));
 app.get('/', (req, res) => {
   res.send('<h1>Dear, Jake just so you know... you rock!</h1>')
