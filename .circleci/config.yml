@@ -2,56 +2,77 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
+######## orbs: #######
+# Orbs are a fairly new feature.
+# Orbs are basically presets for commonly used configurations.
 orbs:
-  # The Node.js orb contains a set of prepackaged CircleCI configuration you can utilize
-  # Orbs reduce the amount of configuration required for common tasks.
-  # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/node
+  # The Node.js orb contains a set of prepackaged CircleCI configuration for running Node.js applications
+  # See orb documentation here: https://circleci.com/developer/orbs/orb/circleci/node
   node: circleci/node@4.1
+  # Orb to handle integration with AWS codeDeploy
   aws-code-deploy: circleci/aws-code-deploy@2.0.0
 
-
+######## jobs: #######
+# Here we define and name (but do not run) "jobs."
+# A "job" is a named series of steps that can be executed by circle ci.
+# We can execute a job in a "workflow" by referencing the job by name.
+# We can define the settings for the job and the steps of the job here.
+# We can also define (and run) a job directly in the workflow itself
 jobs:
-  # Below is the definition of your job to build and test your app, you can rename and customize it as you want.
+  # first we give the job a name: "build-and-test"
   build-and-test:
-    # These next lines define a docker executor: https://circleci.com/docs/2.0/executor-types/
-    # You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # A list of available CircleCI docker Convenience Images are available here: https://circleci.com/developer/images/image/cimg/node
+    # The "docker" key here is where we specify what environment to run the job in
     docker:
+      # "cimg/node:10.23.1" is the docker image we'll use
+      # "10.23.1" is the version of node we're using
       - image: cimg/node:10.23.1
-    # Then run your tests!
-    # CircleCI will report the results back to your VCS provider.
+    # in "steps" we outline the actions the job will take
     steps:
-      # Checkout the code as the first step.
+      # Checkout the current code (from github) as the first step.
       - checkout
-      # Next, the node orb's install-packages step will install the dependencies from a package.json.
-      # The orb install-packages step will also automatically cache them for faster future runs.
+      # "node/install-packages" is a preconfigured step provided by the Node.js orb.
+      # It installs the packages in the application's package.json
+      # It also caches those packages on circle ci for faster execution of the job on future executions
       - node/install-packages
-      # If you are using yarn instead npm, remove the line above and uncomment the two lines below.
-      # - node/install-packages:
-      #     pkg-manager: yarn
+      # In the "run" step, we run command-line commands that need to be executed during the job
       - run:
+          # this just gives the command a name (so logged output/error messages are easier to make sense of)
           name: Run tests
+          # this is the command to run
           command: npm test
 
+######## workflows: #######
+# Below we define actual "workflows."
+# A workflow is the thing that actually gets executed by circle ci.
+# It runs jobs (that we specify)
+# For more details on extending workflows, see the configuration docs: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  # Below is the definition of your workflow.
-  # Inside the workflow, you provide the jobs you want to run, e.g this workflow runs the build-and-test job above.
   # CircleCI will run this workflow on every commit.
-  # For more details on extending your workflow, see the configuration docs: https://circleci.com/docs/2.0/configuration-reference/#workflows
-
+  # "test-server" is the name of the workflow (again, for easier reading of output and errors)
+  # This workflow runs our tests for us when we make a PR on github
   test-server:
-
+    # The jobs the workflow will run
     jobs:
+      # We reference the "build-and-test" job defined above
       - build-and-test
-
-      # For running simple node tests, you could optionally use the node/test job from the orb to replicate and replace the job above in fewer lines.
-      # - node/test
+  # The "deploy" workflow handles deploying changes from github to our production server
+  # It is configured below so that changes are deployed only when a PR is merged into the "main" branch on github
   deploy:
     jobs:
+      # "aws-code-deploy/deploy" is a pre-configured job from the "aws-code-deploy" orb
+      # It makes it easier to configure jobs that use AWS codeDeploy (AWS tool for deployment automation)
+      # The AWS codeDeploy service is not a part of circle ci.
+      # It is configured independently on AWS.
       - aws-code-deploy/deploy:
+          # The "filters" key allows us to run this job in this workflow only under certain circumstances
           filters:
+            # "branches" indicates: only run the job if there are changes to a particular branch (on github)
             branches:
+              # "only" tells circle ci to run the job for just the specified branch(es)
+              # Here, we only want to deploy if changes are made to the "main" branch
               only: main
+          # below are several parameters that are passed along to AWS codeDeploy.
+          # They specify what application to deploy and where/how to go about deploying.
           application-name: Enquizable
           bundle-bucket: enquizable
           bundle-key: enquizable-server-revision
