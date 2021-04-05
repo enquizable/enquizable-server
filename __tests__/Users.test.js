@@ -32,6 +32,7 @@ describe('POST /users', () => {
     expect(createdUser.body.username).toBe('Jon');
     expect(createdUser.body.email).toBe('jon@gmail.com');
     expect(createdUser.body.password).toBe('123');
+    expect(createdUser.body.password).toBe('123');
   })
 });
 
