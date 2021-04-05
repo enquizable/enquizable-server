@@ -2,12 +2,12 @@
   "name": "enquizable-server",
   "version": "1.0.0",
   "description": "A platform for collective quiz creation and improvement.",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "jest",
-    "start": "pm2 start index.js",
-    "stop": "pm2 stop index",
-    "server-dev": "nodemon index.js"
+    "start": "pm2 start server.js",
+    "stop": "pm2 stop server",
+    "server-dev": "nodemon server.js"
   },
   "repository": {
     "type": "git",
